@@ -34,13 +34,13 @@ O projeto segue uma arquitetura moderna dividida em dois módulos:
 
 ### 🎨 Frontend (Cliente)
 * **Framework:** [Angular](https://angular.io/)
-* **Linguagem:** TypeScript
+* **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
 * **Diretório:** [`/frontend`](./frontend)
 
 ### ⚙️ Backend (Servidor)
 * **Framework:** [Spring Boot](https://spring.io/projects/spring-boot)
-* **Linguagem:** Java 17
-* **Build Tool:** Maven
+* **Linguagem:** [Java 17](https://www.oracle.com/java/)
+* **Build Tool:** [Maven](https://maven.apache.org/)
 * **Diretório:** [`/backend`](./backend)
 
 ---
