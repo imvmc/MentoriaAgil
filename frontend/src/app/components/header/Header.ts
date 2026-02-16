@@ -8,8 +8,7 @@ import { RouterModule, Router } from '@angular/router';
   imports: [CommonModule, RouterModule],
   templateUrl: './header.html'
 })
-export class HeaderComponent {
-  // Controle dropdown perfil
+export class Header {
   isMenuOpen = signal(false);
 
   constructor(private router: Router) {}
@@ -19,7 +18,6 @@ export class HeaderComponent {
   }
 
   logout() {
-    // Redireciona para a view de logout
     this.router.navigate(['/logout']);
   }
 }

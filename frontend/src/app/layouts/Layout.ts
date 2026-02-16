@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from '../../components/header/header';
 import { Component } from '@angular/core';
+import { Header } from '../components/header/Header';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderComponent],
+  imports: [CommonModule, RouterOutlet, Header],
   template: `
     <div class="min-h-screen bg-background-light">
       <app-header></app-header>
@@ -17,4 +17,4 @@ import { Component } from '@angular/core';
     </div>
   `
 })
-export class LayoutComponent {}
+export class Layout {}

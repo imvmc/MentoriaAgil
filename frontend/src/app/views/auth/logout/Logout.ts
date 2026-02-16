@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   templateUrl: './logout.html'
 })
-export class LogoutView implements OnInit, OnDestroy {
+export class Logout implements OnInit, OnDestroy {
   contador = 15;
   private timer: any;
 

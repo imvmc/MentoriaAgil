@@ -10,4 +10,4 @@ import { CommonModule } from '@angular/common';
     </div>
   `
 })
-export class DashboardView {}
+export class Dashboard {}

@@ -92,7 +92,7 @@
         <div class="flex items-center mt-2 text-left">
             <input id="terms" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
             <label for="terms" class="ml-2 block text-sm text-gray-500 cursor-pointer text-left">
-              Eu concordo com os <a href="#" class="text-blue-600 hover:underline">Termos de Serviço</a>
+              Eu concordo com os <a (click)="irTermos()" class="text-blue-600 hover:underline">Termos de Serviço</a>
             </label>
         </div>
 
@@ -105,7 +105,7 @@
       </form>
 
       <div class="mt-6 text-center text-sm text-gray-500">
-        Já tem uma conta? <a href="#" class="font-bold text-blue-600 hover:underline">Fazer Login</a>
+        Já tem uma conta? <button (click)="irLogin()" class="font-bold text-blue-600 hover:underline">Fazer Login</button>
       </div>
     </div>
   </div>
