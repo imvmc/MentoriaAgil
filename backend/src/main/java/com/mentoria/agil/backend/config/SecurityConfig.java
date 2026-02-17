@@ -35,25 +35,25 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    	return http
-    			.csrf(csrf -> csrf.disable())
-    			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    			.authorizeHttpRequests(authorize -> authorize
-    					//endpoints publicos
-    					.requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-    					.requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-    					
-    					//endpoints exclusivos de adm
-    					.requestMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
-    					
-    					//outras rotas que precisem de autenticaçao
-    					.anyRequest().authenticated()
-    					)
-					//configuração do 401 unauthorized
-                    .exceptionHandling(exception -> exception
+        return http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/mentores").permitAll() 
+                        
+                        // Proteção de Admin do grupo
+                        .requestMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
+                        
+                        // Bloqueia todo o resto para quem não tem token
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                	)
-    			.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-    			.build();
+                )
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
-}
+} 
