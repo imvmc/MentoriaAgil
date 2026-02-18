@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, map, tap, catchError, of } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { User } from '../models/User';
@@ -17,13 +17,18 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<boolean> {
-    return this.http.post<{ token: string }>(`${this.API_URL}/login`, { email, password })
-      .pipe(
-        tap(response => this.handleAuthentication(response.token)),
-        map(() => true),
-        catchError(() => of(false))
-      );
-  }
+  const headers = new HttpHeaders({ 'Content-Type': 'application/json' }); // Força o JSON
+
+  return this.http.post<{ token: string }>(
+    `${this.API_URL}/login`, 
+    { email, password }, 
+    { headers } 
+  ).pipe(
+    tap(response => this.handleAuthentication(response.token)),
+    map(() => true),
+    catchError(() => of(false))
+  );
+}
 
   register(user: User): Observable<any> {
     return this.http.post(`${this.API_URL}/register`, user);
