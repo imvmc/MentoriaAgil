@@ -22,13 +22,19 @@ public class UserController {
     }
 
     @GetMapping("/mentores")
-    public ResponseEntity<List<MentorResponseDTO>> listarMentores(
-            @RequestParam(required = false) String especialidade,
-            @RequestParam(required = false) String areaAtuacao,
-            @RequestParam(required = false) String tipoMentoria) {
-        
-        List<MentorResponseDTO> mentores = userService.listarMentores(especialidade, areaAtuacao, tipoMentoria);
-        
-        return ResponseEntity.ok(mentores);
+public ResponseEntity<List<MentorResponseDTO>> listarMentores(
+        @RequestParam(required = false) String especialidade,
+        @RequestParam(required = false) String areaAtuacao,
+        @RequestParam(required = false) String tipoMentoria,
+        @RequestParam(required = false) String disponibilidade, 
+        @RequestParam(required = false, defaultValue = "alfabetica") String ordem) { 
+
+    List<MentorResponseDTO> mentores = userService.listarMentores(especialidade, areaAtuacao, tipoMentoria);
+     
+    if ("alfabetica".equalsIgnoreCase(ordem)) {
+        mentores.sort((m1, m2) -> m1.nome().compareToIgnoreCase(m2.nome()));
     }
+
+    return ResponseEntity.ok(mentores);
+}
 }

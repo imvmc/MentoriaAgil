@@ -1,24 +1,23 @@
 package com.mentoria.agil.backend.dto.response;
 
-import com.mentoria.agil.backend.model.User;
+import com.mentoria.agil.backend.model.PerfilMentor;
 
 public record MentorResponseDTO(
-    Long id,
-    String name,
-    String email,
-    String especialidade,
-    String areaInteresse,
-    String tipoMentoria
+    String nome,
+    String especializacao,
+    String experienciaResumida,
+    String areaPrincipal,
+    String tipoMentoria,
+    String disponibilidadeGeral
 ) {
-    // Construtor auxiliar pra converter User -> DTO direto
-    public MentorResponseDTO(User user) {
+    public MentorResponseDTO(PerfilMentor perfil) {
         this(
-            user.getId(),
-            user.getName(),
-            user.getEmail(),
-            user.getEspecialidade(),
-            user.getAreaInteresse(),
-            user.getTipoMentoria()
+            perfil.getUser().getName(),
+            perfil.getEspecializacao(),
+            perfil.getExperiencias(), 
+            perfil.getUser().getAreaInteresse(), 
+            perfil.getUser().getTipoMentoria(),
+            "Disponibilidade sob consulta" 
         );
     }
 }

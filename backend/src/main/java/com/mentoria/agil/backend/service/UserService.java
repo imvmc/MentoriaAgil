@@ -13,6 +13,7 @@ import com.mentoria.agil.backend.dto.response.MentorResponseDTO;
 import com.mentoria.agil.backend.interfaces.service.UserServiceInterface;
 import com.mentoria.agil.backend.model.Role;
 import com.mentoria.agil.backend.model.User;
+import com.mentoria.agil.backend.repository.PerfilMentorRepository;
 import com.mentoria.agil.backend.repository.UserRepository;
 
 @Service
@@ -20,11 +21,13 @@ public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PerfilMentorRepository perfilMentorRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, PerfilMentorRepository perfilMentorRepository) {
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.perfilMentorRepository = perfilMentorRepository; 
+}
 
     @Override
     public User salvarUsuario(UserRequestDTO dto) {
@@ -51,18 +54,23 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public List<MentorResponseDTO> listarMentores(String especialidade, String areaAtuacao, String tipoMentoria) {
-        
-        List<User> mentores = userRepository.findMentores(
-            Role.MENTOR, 
-            especialidade, 
-            areaAtuacao, 
-            tipoMentoria
-        );
-
-        // Converte a lista de Usuários para a lista de DTOs (sem senha)
-        return mentores.stream()
-                .map(MentorResponseDTO::new)
-                .collect(Collectors.toList());
-    }
+public List<MentorResponseDTO> listarMentores(String especialidade, String areaAtuacao, String tipoMentoria) {
+    
+    return perfilMentorRepository.findAll().stream()
+            // Somente Mentores Ativos 
+            .filter(perfil -> perfil.getUser().isAtivo())
+            
+            //  Filtros Dinâmicos 
+            .filter(perfil -> especialidade == null || perfil.getEspecializacao().equalsIgnoreCase(especialidade))
+            .filter(perfil -> areaAtuacao == null || perfil.getUser().getAreaInteresse().equalsIgnoreCase(areaAtuacao))
+            .filter(perfil -> tipoMentoria == null || perfil.getUser().getTipoMentoria().equalsIgnoreCase(tipoMentoria))
+            
+            // Converte para o DTO 
+            .map(MentorResponseDTO::new)
+            
+            // Ordenação Alfabética 
+            .sorted((m1, m2) -> m1.nome().compareToIgnoreCase(m2.nome()))
+            
+            .collect(Collectors.toList());
+}
 }

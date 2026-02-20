@@ -89,7 +89,7 @@ public class PerfilMentorController {
         perfil.setExperiencias(request.getExperiencias());
         perfil.setFormacao(request.getFormacao());
         
-        // Salva
+
         PerfilMentor perfilAtualizado = mentorService.atualizar(user, perfil);
         PerfilMentorResponseDTO response = new PerfilMentorResponseDTO(perfilAtualizado);
         return ResponseEntity.ok(response);
