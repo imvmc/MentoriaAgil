@@ -7,7 +7,9 @@ COPY package*.json ./
 RUN npm ci
 
 # Copiar código e gerar o build de produção
-COPY . .
+COPY angular.json .
+COPY tsconfig*.json .
+COPY src ./src
 RUN npm run build -- --configuration=production
 
 # Estágio 2: Serve (Nginx)
