@@ -2,11 +2,11 @@ name: Frontend CI - Mentoria Ágil
 
 on:
   push:
-    branches: [ main, test-actions ]
+    branches: [ main, desenvolvimento, correcao-bugs ]
     paths:
       - 'frontend/**'
   pull_request:
-    branches: [ main, test-actions ]
+    branches: [ main, desenvolvimento, correcao-bugs ]
     paths:
       - 'frontend/**'
 
@@ -32,5 +32,4 @@ jobs:
         run: npm ci
 
       - name: Run Tests
-        # O Vitest roda em modo CI (uma única vez) automaticamente no GitHub Actions
         run: npm test
