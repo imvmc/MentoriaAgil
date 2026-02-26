@@ -14,12 +14,21 @@ RUN npm run build -- --configuration=production
 
 # Estágio 2: Serve (Nginx)
 FROM nginx:alpine
-# Copia o build do estágio anterior para o diretório do Nginx
-# Ajuste 'mentoria-agil' se o nome do projeto no angular.json for diferente
+
+# Criar usuário não-root
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Copiar build
 COPY --from=build /app/dist/mentoria-agil/browser /usr/share/nginx/html
 
-# Copia uma configuração customizada do Nginx para suportar rotas do Angular (SPA)
+# Copiar config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Ajustar permissões
+RUN chown -R appuser:appgroup /usr/share/nginx/html
+
+# Trocar para usuário não-root
+USER appuser
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
