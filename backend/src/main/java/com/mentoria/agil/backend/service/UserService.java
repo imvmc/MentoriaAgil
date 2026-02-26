@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.mentoria.agil.backend.dto.UserRequestDTO;
-import com.mentoria.agil.backend.dto.response.MentorResponseDTO; 
+import com.mentoria.agil.backend.dto.response.MentorResponseDTO;
 import com.mentoria.agil.backend.interfaces.service.UserServiceInterface;
 import com.mentoria.agil.backend.model.Role;
 import com.mentoria.agil.backend.model.User;
