@@ -36,7 +36,6 @@ public class JwtService implements TokenServiceInterface {
                 .compact();
     }
 
-    // 🪄 NOVO MÉTODO: Isola a repetição de abrir o token e o try/catch
     private Claims getClaimsFromToken(String token) {
         try {
             return Jwts.parser()
