@@ -1,6 +1,5 @@
 export interface MentorDTO {
-  specialty: string;
-  bio: string;
-  experienceYears: number;
-  skills: string[];
+  especializacao: string;
+  experiencias: string;
+  formacao?: string;
 }

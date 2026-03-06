@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MentorService } from '../../../services/mentor/mentor.service';
 import { AuthService } from '../../../auth/auth.service';
+import { MentorDTO } from '../../../models/Mentor';
 
 @Component({
   selector: 'app-mentor-form',
@@ -31,20 +32,23 @@ export class MentorFormComponent {
     this.router.navigate(['/login']);
   }
 
-  enviar() {
-    if (this.mentorForm.valid) {
-      const formValue = this.mentorForm.value;
-      const payload = {
-        ...formValue,
-        skills: typeof formValue.skills === 'string'
-          ? formValue.skills.split(',').map(s => s.trim()).filter(s => s !== "")
-          : []
-      };
+    enviar() {
+  if (this.mentorForm.valid) {
+    const formValue = this.mentorForm.value;
 
-      this.mentorService.createProfile(payload as any).subscribe({
-        next: () => this.router.navigate(['/dashboard']),
-        error: (err) => this.errorMessage = "Erro ao salvar perfil: " + (err.error?.message || "Servidor offline")
-      });
-    }
+    const payload: MentorDTO = {
+      especializacao: formValue.specialty ?? '',
+      experiencias: formValue.experienceYears?.toString() ?? '',
+      formacao: formValue.bio ?? ''
+    };
+
+    this.mentorService.createProfile(payload).subscribe({
+      next: () => this.router.navigate(['/dashboard']),
+      error: (err) =>
+        this.errorMessage =
+          "Erro ao salvar perfil: " +
+          (err.error?.message || "Servidor offline")
+    });
   }
+}
 }

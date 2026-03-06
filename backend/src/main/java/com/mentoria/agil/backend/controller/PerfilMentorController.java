@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mentoria.agil.backend.dto.CriarPerfilMentorDTO;
 import com.mentoria.agil.backend.dto.PerfilMentorRequestDTO;
 import com.mentoria.agil.backend.dto.response.PerfilMentorListResponseDTO;
 import com.mentoria.agil.backend.dto.response.PerfilMentorResponseDTO;
@@ -36,7 +37,7 @@ public class PerfilMentorController {
     }
 
     @PostMapping
-    public ResponseEntity<PerfilMentorResponseDTO> criarPerfilMentor(@Valid @RequestBody PerfilMentorRequestDTO request) {
+    public ResponseEntity<PerfilMentorResponseDTO> criarPerfilMentor(@Valid @RequestBody CriarPerfilMentorDTO request) {
         UserDetails userDetails = getUsuarioAutenticado();
         User userAutenticado = (User) userDetails;
 

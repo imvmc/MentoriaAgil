@@ -17,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
 
 @Entity
 @Table(name = "users")
@@ -49,7 +50,7 @@ public class User implements UserDetails {
 
     private boolean ativo = true; 
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private PerfilMentor perfilMentor;
 
     private LocalDateTime createdAt = LocalDateTime.now();
