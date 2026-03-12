@@ -59,6 +59,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/mentorships/request").hasRole("ESTUDANTE")
                         .requestMatchers(HttpMethod.POST, "/api/sessoes/*/feedback").hasRole("ESTUDANTE")
+
+                        .requestMatchers(HttpMethod.POST, "/api/materiais").hasRole("MENTOR")
                         
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
