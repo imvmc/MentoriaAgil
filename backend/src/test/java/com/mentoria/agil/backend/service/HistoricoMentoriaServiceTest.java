@@ -2,7 +2,7 @@ package com.mentoria.agil.backend.service;
 
 import com.mentoria.agil.backend.dto.response.HistoricoSessaoDTO;
 import com.mentoria.agil.backend.model.*;
-import com.mentoria.agil.backend.repository.MaterialMentoradoRepository;
+import com.mentoria.agil.backend.repository.SessaoMaterialRepository;
 import com.mentoria.agil.backend.repository.SessaoRepository;
 import com.mentoria.agil.backend.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -31,7 +31,7 @@ class HistoricoMentoriaServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private MaterialMentoradoRepository materialMentoradoRepository;
+    private SessaoMaterialRepository sessaoMaterialRepository; 
 
     @InjectMocks
     private HistoricoMentoriaService historicoService;
@@ -40,7 +40,7 @@ class HistoricoMentoriaServiceTest {
     private User mentor;
     private Sessao sessao1, sessao2;
     private Material material1, material2;
-    private MaterialMentorado assoc1, assoc2;
+    private SessaoMaterial sessaoMaterial1, sessaoMaterial2; 
 
     @BeforeEach
     void setUp() {
@@ -52,10 +52,10 @@ class HistoricoMentoriaServiceTest {
         mentor.setId(2L);
         mentor.setRole(Role.MENTOR);
 
-        sessao1 = new Sessao(mentor, mentorado, 
-                LocalDateTime.now().minusDays(5), 
-                LocalDateTime.now().minusDays(5).plusHours(1), 
-                SessaoStatus.CONCLUIDA, 
+        sessao1 = new Sessao(mentor, mentorado,
+                LocalDateTime.now().minusDays(5),
+                LocalDateTime.now().minusDays(5).plusHours(1),
+                SessaoStatus.CONCLUIDA,
                 "Observação 1");
         sessao1.setId(10L);
 
@@ -71,34 +71,42 @@ class HistoricoMentoriaServiceTest {
         material2 = new Material("Material 2", "Desc 2", TipoMaterial.DOCUMENTO, "doc.pdf", mentor);
         material2.setId(200L);
 
-        assoc1 = new MaterialMentorado(material1, mentorado);
-        assoc1.setId(1000L);
-        assoc2 = new MaterialMentorado(material2, mentorado);
-        assoc2.setId(2000L);
+        sessaoMaterial1 = new SessaoMaterial(sessao1, material1);
+        sessaoMaterial1.setId(1000L);
+        sessaoMaterial2 = new SessaoMaterial(sessao2, material2);
+        sessaoMaterial2.setId(2000L);
     }
 
     @Test
     void deveListarHistoricoSemFiltroDeMentor() {
         when(sessaoRepository.findByMentoradoAndStatusOrderByDataHoraInicioDesc(mentorado, SessaoStatus.CONCLUIDA))
                 .thenReturn(List.of(sessao1, sessao2));
-        when(materialMentoradoRepository.findByMentoradoAndMaterial_Mentor(mentorado, mentor))
-                .thenReturn(List.of(assoc1, assoc2));
+
+        // Mock para cada sessão retornar seus materiais
+        when(sessaoMaterialRepository.findBySessaoId(sessao1.getId()))
+                .thenReturn(List.of(sessaoMaterial1));
+        when(sessaoMaterialRepository.findBySessaoId(sessao2.getId()))
+                .thenReturn(List.of(sessaoMaterial2));
 
         List<HistoricoSessaoDTO> resultado = historicoService.listarHistorico(mentorado, null);
 
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
 
-        HistoricoSessaoDTO dto1 = resultado.get(0);
-        assertEquals(sessao1.getId(), dto1.getId());
+        HistoricoSessaoDTO dto1 = resultado.stream().filter(d -> d.getId().equals(10L)).findFirst().orElseThrow();
         assertEquals(sessao1.getObservacoes(), dto1.getDescricao());
         assertEquals(mentor.getId(), dto1.getMentor().getId());
         assertEquals(mentor.getName(), dto1.getMentor().getNome());
-        assertEquals(2, dto1.getMateriais().size());
+        assertEquals(1, dto1.getMateriais().size());
         assertEquals(material1.getId(), dto1.getMateriais().get(0).getId());
 
+        HistoricoSessaoDTO dto2 = resultado.stream().filter(d -> d.getId().equals(20L)).findFirst().orElseThrow();
+        assertEquals(1, dto2.getMateriais().size());
+        assertEquals(material2.getId(), dto2.getMateriais().get(0).getId());
+
         verify(sessaoRepository, times(1)).findByMentoradoAndStatusOrderByDataHoraInicioDesc(mentorado, SessaoStatus.CONCLUIDA);
-        verify(materialMentoradoRepository, times(2)).findByMentoradoAndMaterial_Mentor(mentorado, mentor);
+        verify(sessaoMaterialRepository, times(1)).findBySessaoId(sessao1.getId());
+        verify(sessaoMaterialRepository, times(1)).findBySessaoId(sessao2.getId());
     }
 
     @Test
@@ -107,8 +115,8 @@ class HistoricoMentoriaServiceTest {
         when(userRepository.findById(mentorId)).thenReturn(Optional.of(mentor));
         when(sessaoRepository.findByMentoradoAndMentorAndStatusOrderByDataHoraInicioDesc(mentorado, mentor, SessaoStatus.CONCLUIDA))
                 .thenReturn(List.of(sessao1));
-        when(materialMentoradoRepository.findByMentoradoAndMaterial_Mentor(mentorado, mentor))
-                .thenReturn(List.of(assoc1));
+        when(sessaoMaterialRepository.findBySessaoId(sessao1.getId()))
+                .thenReturn(List.of(sessaoMaterial1));
 
         List<HistoricoSessaoDTO> resultado = historicoService.listarHistorico(mentorado, mentorId);
 
@@ -116,9 +124,11 @@ class HistoricoMentoriaServiceTest {
         assertEquals(1, resultado.size());
         assertEquals(sessao1.getId(), resultado.get(0).getId());
         assertEquals(1, resultado.get(0).getMateriais().size());
+        assertEquals(material1.getId(), resultado.get(0).getMateriais().get(0).getId());
 
         verify(userRepository, times(1)).findById(mentorId);
         verify(sessaoRepository, times(1)).findByMentoradoAndMentorAndStatusOrderByDataHoraInicioDesc(mentorado, mentor, SessaoStatus.CONCLUIDA);
+        verify(sessaoMaterialRepository, times(1)).findBySessaoId(sessao1.getId());
     }
 
     @Test
@@ -130,6 +140,7 @@ class HistoricoMentoriaServiceTest {
 
         verify(userRepository, times(1)).findById(mentorId);
         verify(sessaoRepository, never()).findByMentoradoAndMentorAndStatusOrderByDataHoraInicioDesc(any(), any(), any());
+        verify(sessaoMaterialRepository, never()).findBySessaoId(any());
     }
 
     @Test
@@ -142,15 +153,16 @@ class HistoricoMentoriaServiceTest {
         assertNotNull(resultado);
         assertTrue(resultado.isEmpty());
 
-        verify(materialMentoradoRepository, never()).findByMentoradoAndMaterial_Mentor(any(), any());
+        verify(sessaoMaterialRepository, never()).findBySessaoId(any());
     }
 
     @Test
     void deveIncluirMateriaisCorretamente() {
         when(sessaoRepository.findByMentoradoAndStatusOrderByDataHoraInicioDesc(mentorado, SessaoStatus.CONCLUIDA))
                 .thenReturn(List.of(sessao1));
-        when(materialMentoradoRepository.findByMentoradoAndMaterial_Mentor(mentorado, mentor))
-                .thenReturn(List.of(assoc1, assoc2));
+        // Sessão 1 tem dois materiais
+        when(sessaoMaterialRepository.findBySessaoId(sessao1.getId()))
+                .thenReturn(List.of(sessaoMaterial1, sessaoMaterial2));
 
         List<HistoricoSessaoDTO> resultado = historicoService.listarHistorico(mentorado, null);
 

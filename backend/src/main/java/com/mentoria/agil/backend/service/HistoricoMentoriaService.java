@@ -2,10 +2,12 @@ package com.mentoria.agil.backend.service;
 
 import com.mentoria.agil.backend.dto.response.HistoricoSessaoDTO;
 import com.mentoria.agil.backend.interfaces.service.HistoricoMentoriaServiceInterface;
+import com.mentoria.agil.backend.model.Material;
 import com.mentoria.agil.backend.model.Sessao;
+import com.mentoria.agil.backend.model.SessaoMaterial;
 import com.mentoria.agil.backend.model.SessaoStatus;
 import com.mentoria.agil.backend.model.User;
-import com.mentoria.agil.backend.repository.MaterialMentoradoRepository;
+import com.mentoria.agil.backend.repository.SessaoMaterialRepository;
 import com.mentoria.agil.backend.repository.SessaoRepository;
 import com.mentoria.agil.backend.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,15 +21,16 @@ public class HistoricoMentoriaService implements HistoricoMentoriaServiceInterfa
 
     private final SessaoRepository sessaoRepository;
     private final UserRepository userRepository;
-    private final MaterialMentoradoRepository materialMentoradoRepository;
+    private final SessaoMaterialRepository sessaoMaterialRepository;
 
     public HistoricoMentoriaService(SessaoRepository sessaoRepository, UserRepository userRepository, 
-                                            MaterialMentoradoRepository materialMentoradoRepository) {
+                                            SessaoMaterialRepository sessaoMaterialRepository) {
         this.sessaoRepository = sessaoRepository;
         this.userRepository = userRepository;
-        this.materialMentoradoRepository = materialMentoradoRepository;
+        this.sessaoMaterialRepository = sessaoMaterialRepository;
     }
 
+    @Override
     public List<HistoricoSessaoDTO> listarHistorico(User mentorado, Long mentorId) {
         List<Sessao> sessoes;
 
@@ -43,11 +46,10 @@ public class HistoricoMentoriaService implements HistoricoMentoriaServiceInterfa
 
         return sessoes.stream()
                 .map(sessao -> {
-                    // Busca os materiais de apoio do mentor associados a este mentorado
-                    List<com.mentoria.agil.backend.model.Material> materiais = materialMentoradoRepository
-                            .findByMentoradoAndMaterial_Mentor(mentorado, sessao.getMentor())
+                    // Busca os materiais de apoio associados a uma sessão específica
+                    List<Material> materiais = sessaoMaterialRepository.findBySessaoId(sessao.getId())
                             .stream()
-                            .map(assoc -> assoc.getMaterial())
+                            .map(SessaoMaterial::getMaterial)
                             .collect(Collectors.toList());
                     return new HistoricoSessaoDTO(sessao, materiais);
                 })

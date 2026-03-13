@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/mentorias/request").hasRole("ESTUDANTE")
                         .requestMatchers(HttpMethod.GET, "/api/mentorias/historico").hasRole("ESTUDANTE")
                         .requestMatchers(HttpMethod.POST, "/api/sessoes/**/feedback").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.POST, "/api/sessoes/**/materiais/**").hasRole("MENTOR")
 
                         .requestMatchers(HttpMethod.POST, "/api/materiais").hasRole("MENTOR")
                         .requestMatchers(HttpMethod.GET, "/api/materiais/meus-materiais").hasRole("ESTUDANTE")
