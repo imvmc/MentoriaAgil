@@ -1,11 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Component, OnInit } from '@angular/core';
 import { PerfilMentorService } from '../../services/perfil-mentor.service';
 import { PerfilMentor } from '../../models/PerfilMentor';
-import { SolicitacaoMentoriaModalComponent } from './mentoria/solicitacao-mentoria-modal.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-mentor-list',
@@ -15,9 +12,6 @@ import { SolicitacaoMentoriaModalComponent } from './mentoria/solicitacao-mentor
   styleUrls: ['./mentor-list.component.css']
 })
 export class MentorListComponent implements OnInit {
-  private mentorService = inject(PerfilMentorService);
-  private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
 
   mentores: PerfilMentor[] = [];
 
@@ -28,28 +22,27 @@ export class MentorListComponent implements OnInit {
     ordenacao: ''
   };
 
+  constructor(private mentorService: PerfilMentorService) {}
+
   ngOnInit(): void {
     this.buscar();
   }
 
-  buscar(): void {
-    this.mentorService.buscarMentores(this.filtros).subscribe(data => {
-      let lista = data.filter(m => m.ativo);
-      if (this.filtros.ordenacao === 'nome') {
-        lista = lista.sort((a, b) => a.name.localeCompare(b.name));
-      }
-      this.mentores = lista;
-    });
+  buscar() {
+    this.mentorService.buscarMentores(this.filtros)
+      .subscribe(data => {
+
+        let lista = data.filter(m => m.ativo);
+
+        if (this.filtros.ordenacao === 'nome') {
+          lista = lista.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        this.mentores = lista;
+      });
   }
 
-  onFiltroChange(): void {
+  onFiltroChange() {
     this.buscar();
-  }
-
-  solicitarMentoria(mentor: PerfilMentor): void {
-    const dialogRef = this.dialog.open(SolicitacaoMentoriaModalComponent, {
-      width: '500px',
-      data: { mentor }
-    });
   }
 }
