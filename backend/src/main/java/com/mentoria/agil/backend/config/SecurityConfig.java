@@ -56,9 +56,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/mentors/**").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/api/users/mentores").authenticated()
+                        
+                        .requestMatchers(HttpMethod.POST, "/api/mentorias/request").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.GET, "/api/mentorias/historico").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.POST, "/api/sessoes/**/feedback").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.POST, "/api/sessoes/**/materiais/**").hasRole("MENTOR")
 
-                        .requestMatchers(HttpMethod.POST, "/api/mentorships/request").hasRole("ESTUDANTE")
-                        .requestMatchers(HttpMethod.POST, "/api/sessoes/*/feedback").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.POST, "/api/materiais").hasRole("MENTOR")
+                        .requestMatchers(HttpMethod.GET, "/api/materiais/meus-materiais").hasRole("ESTUDANTE")
                         
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 

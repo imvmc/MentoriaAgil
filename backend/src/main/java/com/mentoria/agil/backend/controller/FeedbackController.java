@@ -2,9 +2,9 @@ package com.mentoria.agil.backend.controller;
 
 import com.mentoria.agil.backend.dto.FeedbackRequestDTO;
 import com.mentoria.agil.backend.dto.response.FeedbackResponseDTO;
+import com.mentoria.agil.backend.interfaces.service.FeedbackServiceInterface;
 import com.mentoria.agil.backend.model.Feedback;
 import com.mentoria.agil.backend.model.User;
-import com.mentoria.agil.backend.service.FeedbackService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/sessoes")
 public class FeedbackController {
 
-    private final FeedbackService feedbackService;
+    private final FeedbackServiceInterface feedbackService;
 
-    public FeedbackController(FeedbackService feedbackService) {
+    public FeedbackController(FeedbackServiceInterface feedbackService) {
         this.feedbackService = feedbackService;
     }
 
