@@ -62,15 +62,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/mentorias/pendentes").hasRole("MENTOR")
                         .requestMatchers(HttpMethod.PATCH, "/api/mentorias/**").hasRole("MENTOR")
 
-                        .requestMatchers(HttpMethod.POST, "/api/disponibilidades").hasRole("MENTOR")
-                        .requestMatchers(HttpMethod.GET, "/api/disponibilidades/mentor/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/sessoes/agendar").hasRole("ESTUDANTE")
-
-                        .requestMatchers(HttpMethod.POST, "/api/sessoes/**/feedback").hasRole("ESTUDANTE")
-                        .requestMatchers(HttpMethod.POST, "/api/sessoes/**/materiais/**").hasRole("MENTOR")
-
-                        .requestMatchers(HttpMethod.POST, "/api/materiais").hasRole("MENTOR")
-                        .requestMatchers(HttpMethod.GET, "/api/materiais/meus-materiais").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.POST, "/api/mentorships/request").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.POST, "/api/sessoes/**").hasRole("ESTUDANTE")
                         
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
@@ -86,7 +79,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:8080"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:8080", "https://mentoria-agil-frontend.onrender.com"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));

@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, map, tap, catchError, of } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { User } from '../models/User';
+import { environment } from '../../enviroments/enviroment';
 
 export type UserRole = 'ADMIN' | 'MENTOR' | 'USER' | 'VISITANTE';
 
@@ -11,7 +12,7 @@ export type UserRole = 'ADMIN' | 'MENTOR' | 'USER' | 'VISITANTE';
 })
 export class AuthService {
 
-  private readonly API_URL = 'http://localhost:8080/auth';
+  private readonly API_URL = `${environment.apiUrl}/auth`;
 
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'auth_user';
