@@ -137,11 +137,13 @@
 				<version>0.8.12</version>
 				<configuration>
 					<excludes>
+						<exclude>java/**</exclude>
+						<exclude>javax/**</exclude>
+						<exclude>jdk/**</exclude>
 						<exclude>com/mentoria/agil/backend/model/*$Hibernate*</exclude>
 						<exclude>com/mentoria/agil/backend/model/Feedback$HibernateProxy*</exclude>
 						<exclude>**/dto/**</exclude>
 						<exclude>**/exception/**</exclude>
-						<exclude>com/mentoria/agil/backend/BackendApplication.class</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -157,7 +159,6 @@
 							<goal>report</goal>
 						</goals>
 					</execution>
-					<!-- verifica se a cobertura mínima é atingida -->
 					<execution>
 						<id>check</id>
 						<phase>verify</phase>
@@ -172,7 +173,7 @@
 										<limit>
 											<counter>INSTRUCTION</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.70</minimum> <!-- 70% de cobertura -->
+											<minimum>0.70</minimum>
 										</limit>
 									</limits>
 								</rule>
