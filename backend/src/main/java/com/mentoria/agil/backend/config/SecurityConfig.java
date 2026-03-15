@@ -47,13 +47,23 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                        
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         
                         .requestMatchers(HttpMethod.POST, "/api/mentors/**").hasRole("MENTOR")
                         .requestMatchers(HttpMethod.PUT, "/api/mentors/**").hasRole("MENTOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/mentors/**").hasAnyRole("MENTOR", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/mentors/**").authenticated()
+
                         .requestMatchers(HttpMethod.GET, "/api/users/mentores").authenticated()
+                        
+                        .requestMatchers(HttpMethod.POST, "/api/mentorias/request").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.GET, "/api/mentorias/historico").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.GET, "/api/mentorias/pendentes").hasRole("MENTOR")
+                        .requestMatchers(HttpMethod.PATCH, "/api/mentorias/**").hasRole("MENTOR")
+
+                        .requestMatchers(HttpMethod.POST, "/api/mentorships/request").hasRole("ESTUDANTE")
+                        .requestMatchers(HttpMethod.POST, "/api/sessoes/**").hasRole("ESTUDANTE")
                         
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
@@ -69,7 +79,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:8080"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:8080", "https://mentoria-agil-frontend.onrender.com"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));

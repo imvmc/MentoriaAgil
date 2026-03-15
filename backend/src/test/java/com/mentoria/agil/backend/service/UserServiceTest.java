@@ -2,6 +2,7 @@ package com.mentoria.agil.backend.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
@@ -16,11 +17,10 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.mentoria.agil.backend.dto.UserRequestDTO;
+import com.mentoria.agil.backend.exception.EmailJaCadastradoException;
 import com.mentoria.agil.backend.model.Role;
 import com.mentoria.agil.backend.model.User;
 import com.mentoria.agil.backend.repository.UserRepository;
@@ -41,22 +41,22 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
-    
+
     @Captor
     private ArgumentCaptor<User> userCaptor;
-    
+
     private Validator validator;
     private UserRequestDTO userRequestDTO;
     private User userMock;
 
     @BeforeEach
     void setUp() {
-    	//para testar as anotaçoes do dto
-    	ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        // para testar as anotaçoes do dto
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-        
+
         userRequestDTO = new UserRequestDTO("João Silva", "joao@email.com", "senha123", Role.ADMIN);
-        
+
         userMock = new User();
         userMock.setName("João Silva");
         userMock.setEmail("joao@email.com");
@@ -72,7 +72,7 @@ public class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(userMock);
 
         userService.salvarUsuario(userRequestDTO);
-        
+
         verify(userRepository, times(1)).save(userCaptor.capture());
         User usuarioMapeado = userCaptor.getValue();
 
@@ -91,13 +91,12 @@ public class UserServiceTest {
     void salvarUsuarioEmailExistente() {
         when(userRepository.existsByEmail(userRequestDTO.email())).thenReturn(true);
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        EmailJaCadastradoException exception = assertThrows(EmailJaCadastradoException.class, () -> {
             userService.salvarUsuario(userRequestDTO);
         });
 
-        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
-        assertEquals("Este e-mail já está cadastrado.", exception.getReason());
-        
+        assertEquals("Este e-mail já está cadastrado.", exception.getMessage());
+
         verify(passwordEncoder, never()).encode(anyString());
         verify(userRepository, never()).save(any(User.class));
     }
@@ -108,7 +107,7 @@ public class UserServiceTest {
         UserRequestDTO dtoSemRole = new UserRequestDTO("Maria", "maria@email.com", "senha123", null);
         User userVisitante = new User();
         userVisitante.setRole(Role.VISITANTE);
-        
+
         when(userRepository.existsByEmail(dtoSemRole.email())).thenReturn(false);
         when(passwordEncoder.encode(dtoSemRole.password())).thenReturn("hash");
         when(userRepository.save(any(User.class))).thenReturn(userVisitante);
@@ -138,7 +137,7 @@ public class UserServiceTest {
 
         assertNull(resultado);
     }
-    
+
     @Test
     @DisplayName("Não deve gerar violações para um DTO válido")
     void dtoValido() {
@@ -151,7 +150,7 @@ public class UserServiceTest {
     void validacaoNomeEmBranco() {
         UserRequestDTO dtoInvalido = new UserRequestDTO("", "joao@email.com", "senha123", Role.VISITANTE);
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(dtoInvalido);
-        
+
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("O nome é obrigatório")));
     }
@@ -161,17 +160,17 @@ public class UserServiceTest {
     void validacaoEmailInvalido() {
         UserRequestDTO dtoInvalido = new UserRequestDTO("João", "email-invalido", "senha123", Role.VISITANTE);
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(dtoInvalido);
-        
+
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("E-mail inválido")));
     }
-    
+
     @Test
     @DisplayName("Deve falhar na validação se o e-mail estiver em branco")
     void validacaoEmailEmBranco() {
         UserRequestDTO dtoInvalido = new UserRequestDTO("João", "", "senha123", Role.VISITANTE);
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(dtoInvalido);
-        
+
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("O e-mail é obrigatório")));
     }
@@ -181,17 +180,17 @@ public class UserServiceTest {
     void validacaoSenhaCurta() {
         UserRequestDTO dtoInvalido = new UserRequestDTO("João", "joao@email.com", "1234567", Role.VISITANTE);
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(dtoInvalido);
-        
+
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("A senha deve ter no mínimo 8 caracteres")));
     }
-    
+
     @Test
     @DisplayName("Deve falhar na validação se a senha estiver em branco")
     void validacaoSenhaEmBranco() {
         UserRequestDTO dtoInvalido = new UserRequestDTO("João", "joao@email.com", "", Role.VISITANTE);
         Set<ConstraintViolation<UserRequestDTO>> violations = validator.validate(dtoInvalido);
-        
+
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("A senha é obrigatória")));
     }
