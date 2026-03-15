@@ -32,14 +32,14 @@ public class MentoriaRequestService implements MentoriaRequestServiceInterface {
         User mentor = userRepository.findById(dto.getMentorId())
                 .orElseThrow(() -> new EntityNotFoundException("Mentor não encontrado"));
 
-        // Validação de mentor
-        if (mentor.getRole() != Role.MENTOR) {
-            throw new BusinessException("O usuário selecionado não é um mentor");
-        }
-
         // Impedir auto-mentoria
         if (mentorado.getId().equals(mentor.getId())) {
             throw new BusinessException("Você não pode solicitar mentoria para si mesmo");
+        }
+
+        // Validação de mentor
+        if (mentor.getRole() != Role.MENTOR) {
+            throw new BusinessException("O usuário selecionado não é um mentor");
         }
 
         // Verificar duplicidade (solicitação pendente)
