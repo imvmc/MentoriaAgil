@@ -7,11 +7,11 @@ on:
   pull_request:
     branches: [ main, desenvolvimento, correcao-bugs ]
 
-jobs:
-  defaults:
-      run:
-        working-directory: backend
-        
+defaults:
+  run:
+    working-directory: backend
+
+jobs:        
   build:
     runs-on: ubuntu-latest
 
