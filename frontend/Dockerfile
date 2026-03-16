@@ -5,6 +5,8 @@ RUN npm ci
 COPY angular.json .
 COPY tsconfig*.json .
 COPY src ./src
+
+RUN find src/environments -maxdepth 2
 RUN npx ng build --configuration=production
 
 FROM nginx:alpine
