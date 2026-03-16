@@ -4,6 +4,8 @@ COPY package*.json ./
 RUN npm ci
 COPY angular.json .
 COPY tsconfig*.json .
+
+COPY src/environments ./src/environments
 COPY src ./src
 
 RUN find src/environments -maxdepth 2
