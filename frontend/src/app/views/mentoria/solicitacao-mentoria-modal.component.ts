@@ -25,10 +25,10 @@ import { PerfilMentor } from '../../models/PerfilMentor';
   styleUrls: ['./solicitacao-mentoria-modal.css']
 })
 export class SolicitacaoMentoriaModalComponent {
-  private readonly fb = inject(FormBuilder);
-  private readonly mentoriaService = inject(MentoriaService);
-  private readonly snackBar = inject(MatSnackBar);
-  private readonly dialogRef = inject(MatDialogRef<SolicitacaoMentoriaModalComponent>);
+  private readonly fb: FormBuilder = inject(FormBuilder);
+  private readonly mentoriaService: MentoriaService = inject(MentoriaService);
+  private readonly snackBar: MatSnackBar = inject(MatSnackBar);
+  private readonly dialogRef: MatDialogRef<SolicitacaoMentoriaModalComponent> = inject(MatDialogRef<SolicitacaoMentoriaModalComponent>);
 
   loading = false;
 
