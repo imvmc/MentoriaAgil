@@ -145,6 +145,10 @@ O sistema encontra-se implantado na plataforma Render:
 [https://mentoria-agil-backend-1f3r.onrender.com](https://mentoria-agil-backend-1f3r.onrender.com)
 
 ### 🎨 Frontend
+[![STATUS](https://img.shields.io/badge/STATUS-ONLINE-green)](https://stats.uptimerobot.com/u5ZyVIiXk0)
+<br>
 [https://mentoria-agil-frontend.onrender.com](https://mentoria-agil-frontend.onrender.com)
 
+### Service Status Page
+https://stats.uptimerobot.com/u5ZyVIiXk0
 ---
