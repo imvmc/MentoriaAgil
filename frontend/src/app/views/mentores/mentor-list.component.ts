@@ -1,15 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PerfilMentorService } from '../../services/perfil-mentor.service';
 import { PerfilMentor } from '../../models/PerfilMentor';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SolicitacaoMentoriaModalComponent } from '../mentoria/solicitacao-mentoria-modal.component';
 
 @Component({
   selector: 'app-mentor-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatDialogModule],
   templateUrl: './mentor-list.component.html',
   styleUrls: ['./mentor-list.component.css']
 })
@@ -24,7 +24,10 @@ export class MentorListComponent implements OnInit {
     ordenacao: ''
   };
 
-  constructor(private mentorService: PerfilMentorService, private dialog: MatDialog) {}
+  constructor(
+    private mentorService: PerfilMentorService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.buscar();
@@ -33,7 +36,6 @@ export class MentorListComponent implements OnInit {
   buscar() {
     this.mentorService.buscarMentores(this.filtros)
       .subscribe(data => {
-
         let lista = data.filter(m => m.ativo);
 
         if (this.filtros.ordenacao === 'nome') {
@@ -48,15 +50,15 @@ export class MentorListComponent implements OnInit {
     this.buscar();
   }
 
-  solicitarMentoria(mentor: PerfilMentor): void {
+  abrirAgendamento(mentorId: number): void {
     const dialogRef = this.dialog.open(SolicitacaoMentoriaModalComponent, {
-      width: '500px',
-      data: { mentor }
+      width: '600px',
+      data: { mentorId }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Solicitação enviada com sucesso');
+        console.log('Sessão agendada com sucesso');
       }
     });
   }

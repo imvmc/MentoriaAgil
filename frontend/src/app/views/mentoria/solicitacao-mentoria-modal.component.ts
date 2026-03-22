@@ -1,13 +1,15 @@
 import { Component, Inject, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { PerfilMentor } from '../../models/PerfilMentor';
+import { MatSelectModule } from '@angular/material/select';
+
 import { MentoriaService } from '../../services/mentoria/mentoria.service';
+import { AgendamentoRequest } from '../../models/AgendamentoRequest';
 
 @Component({
   selector: 'app-solicitacao-mentoria-modal',
@@ -16,51 +18,101 @@ import { MentoriaService } from '../../services/mentoria/mentoria.service';
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
+    MatSnackBarModule,
+    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-    MatSnackBarModule
+    MatSelectModule
   ],
   templateUrl: './solicitacao-mentoria-modal.component.html',
   styleUrls: ['./solicitacao-mentoria-modal.component.css']
 })
 export class SolicitacaoMentoriaModalComponent {
-  private readonly fb: FormBuilder = inject(FormBuilder);
-  private readonly mentoriaService: MentoriaService = inject(MentoriaService);
-  private readonly snackBar: MatSnackBar = inject(MatSnackBar);
-  private readonly dialogRef: MatDialogRef<SolicitacaoMentoriaModalComponent> = inject(MatDialogRef<SolicitacaoMentoriaModalComponent>);
+  private fb = inject(FormBuilder);
+  private mentoriaService = inject(MentoriaService);
+  private snackBar = inject(MatSnackBar);
 
+  form: FormGroup;
   loading = false;
 
-  form = this.fb.group({
-    message: ['', [Validators.required, Validators.maxLength(500)]]
-  });
+  constructor(
+    public dialogRef: MatDialogRef<SolicitacaoMentoriaModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { mentorId: number }
+  ) {
+    this.form = this.fb.group({
+      dataHoraInicio: ['', Validators.required],
+      dataHoraFim: ['', Validators.required],
+      formato: ['ONLINE', Validators.required],
+      linkReuniao: [''],
+      endereco: ['']
+    });
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { mentor: PerfilMentor }) {}
+    this.form.get('formato')?.valueChanges.subscribe((formato) => {
+      this.atualizarValidacoes(formato);
+    });
 
-  cancelar(): void {
-    this.dialogRef.close(false);
+    this.atualizarValidacoes(this.form.get('formato')?.value);
   }
 
-  enviar(): void {
-    if (this.form.invalid) return;
+  atualizarValidacoes(formato: 'ONLINE' | 'PRESENCIAL') {
+    const linkControl = this.form.get('linkReuniao');
+    const enderecoControl = this.form.get('endereco');
 
-    this.loading = true;
-    const request = {
-      mentorId: this.data.mentor.id,
-      message: this.form.value.message!
+    linkControl?.clearValidators();
+    enderecoControl?.clearValidators();
+
+    if (formato === 'ONLINE') {
+      linkControl?.setValidators([Validators.required]);
+    } else {
+      enderecoControl?.setValidators([Validators.required]);
+    }
+
+    linkControl?.updateValueAndValidity();
+    enderecoControl?.updateValueAndValidity();
+  }
+
+  salvar() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.snackBar.open('Preencha os campos obrigatórios.', 'Fechar', { duration: 3000 });
+      return;
+    }
+
+    const payload: AgendamentoRequest = {
+      mentorId: this.data.mentorId,
+      dataHoraInicio: this.form.value.dataHoraInicio,
+      dataHoraFim: this.form.value.dataHoraFim,
+      formato: this.form.value.formato,
+      linkReuniao: this.form.value.formato === 'ONLINE' ? this.form.value.linkReuniao : undefined,
+      endereco: this.form.value.formato === 'PRESENCIAL' ? this.form.value.endereco : undefined
     };
 
-    this.mentoriaService.solicitarMentoria(request).subscribe({
+    this.loading = true;
+
+    this.mentoriaService.agendarSessao(payload).subscribe({
       next: () => {
-        this.snackBar.open('Solicitação enviada com sucesso!', 'Fechar', { duration: 3000 });
+        this.loading = false;
+        this.snackBar.open(
+          'Sessão agendada com sucesso! Notificação enviada.',
+          'Fechar',
+          { duration: 4000 }
+        );
         this.dialogRef.close(true);
       },
-      error: (err: any) => {
+      error: (err) => {
         this.loading = false;
-        const mensagem = err.error?.error || 'Erro ao enviar solicitação. Tente novamente.';
-        this.snackBar.open(mensagem, 'Fechar', { duration: 5000 });
+
+        const mensagem =
+          err?.error?.message ||
+          err?.error?.erro ||
+          'Erro ao agendar sessão.';
+
+        this.snackBar.open(mensagem, 'Fechar', { duration: 4000 });
       }
     });
+  }
+
+  cancelar() {
+    this.dialogRef.close(false);
   }
 }

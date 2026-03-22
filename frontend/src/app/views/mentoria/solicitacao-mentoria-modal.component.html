@@ -1,33 +1,71 @@
-<h2 mat-dialog-title>Solicitar mentoria com {{ data.mentor.name }}</h2>
-    <mat-dialog-content>
-      <form [formGroup]="form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Mensagem de introdução</mat-label>
-          <textarea
-            matInput
-            formControlName="message"
-            rows="4"
-            placeholder="Conte ao mentor seus objetivos e expectativas..."
-            maxlength="500"
-          ></textarea>
-          <mat-hint align="end">{{ form.get('message')?.value?.length || 0 }}/500</mat-hint>
-          <mat-error *ngIf="form.get('message')?.hasError('required')">
-            A mensagem é obrigatória
-          </mat-error>
-          <mat-error *ngIf="form.get('message')?.hasError('maxlength')">
-            Máximo de 500 caracteres
-          </mat-error>
-        </mat-form-field>
-      </form>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="cancelar()" [disabled]="loading">Cancelar</button>
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="enviar()"
-        [disabled]="form.invalid || loading"
-      >
-        {{ loading ? 'Enviando...' : 'Enviar solicitação' }}
-      </button>
-    </mat-dialog-actions>
+<h2 mat-dialog-title>Agendar Sessão de Mentoria</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="form-container">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Data/Hora de Início</mat-label>
+      <input matInput type="datetime-local" formControlName="dataHoraInicio" />
+      <mat-error *ngIf="form.get('dataHoraInicio')?.hasError('required')">
+        Campo obrigatório
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Data/Hora de Fim</mat-label>
+      <input matInput type="datetime-local" formControlName="dataHoraFim" />
+      <mat-error *ngIf="form.get('dataHoraFim')?.hasError('required')">
+        Campo obrigatório
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Formato da Sessão</mat-label>
+      <mat-select formControlName="formato">
+        <mat-option value="ONLINE">Online</mat-option>
+        <mat-option value="PRESENCIAL">Presencial</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('formato')?.hasError('required')">
+        Campo obrigatório
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field
+      *ngIf="form.get('formato')?.value === 'ONLINE'"
+      appearance="outline"
+      class="full-width"
+    >
+      <mat-label>Link da Reunião</mat-label>
+      <input matInput type="text" formControlName="linkReuniao" />
+      <mat-error *ngIf="form.get('linkReuniao')?.hasError('required')">
+        Campo obrigatório para sessão online
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field
+      *ngIf="form.get('formato')?.value === 'PRESENCIAL'"
+      appearance="outline"
+      class="full-width"
+    >
+      <mat-label>Endereço</mat-label>
+      <input matInput type="text" formControlName="endereco" />
+      <mat-error *ngIf="form.get('endereco')?.hasError('required')">
+        Campo obrigatório para sessão presencial
+      </mat-error>
+    </mat-form-field>
+
+    <p class="info-text">
+      Ao agendar a sessão, o sistema enviará uma notificação imediata ao mentor e ao mentorado.
+    </p>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancelar()" [disabled]="loading">
+    Cancelar
+  </button>
+
+  <button mat-raised-button color="primary" type="button" (click)="salvar()" [disabled]="loading">
+    {{ loading ? 'Agendando...' : 'Agendar Sessão' }}
+  </button>
+</mat-dialog-actions>
